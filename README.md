@@ -1,2 +1,0 @@
-# NewGraphQL
-this is graphQl
