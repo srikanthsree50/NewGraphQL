@@ -2,15 +2,10 @@ const path = require('path');
 
 const express = require('express');
 const bodyParser = require('body-parser');
+const mongoose = require('mongoose');
 
 const errorController = require('./controllers/error');
-const sequelize = require('./util/database');
-const Product = require('./models/product');
 const User = require('./models/user');
-const Cart = require('./models/cart');
-const CartItem = require('./models/cart-item');
-const Order = require('./models/order');
-const OrderItem = require('./models/order-item');
 
 const app = express();
 
@@ -23,13 +18,13 @@ const shopRoutes = require('./routes/shop');
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use((req, res, next) => {
-  User.findById(1)
-    .then(user => {
+ app.use((req, res, next) => {
+   User.findById('5d7f61351e64281500c5705e')
+     .then(user => {
       req.user = user;
-      next();
-    })
-    .catch(err => console.log(err));
+       next();
+     })
+     .catch(err => console.log(err));
 });
 
 app.use('/admin', adminRoutes);
@@ -37,34 +32,21 @@ app.use(shopRoutes);
 
 app.use(errorController.get404);
 
-Product.belongsTo(User, { constraints: true, onDelete: 'CASCADE' });
-User.hasMany(Product);
-User.hasOne(Cart);
-Cart.belongsTo(User);
-Cart.belongsToMany(Product, { through: CartItem });
-Product.belongsToMany(Cart, { through: CartItem });
-Order.belongsTo(User);
-User.hasMany(Order);
-Order.belongsToMany(Product, { through: OrderItem });
-
-sequelize
-  // .sync({ force: true })
-  .sync()
+mongoose
+  .connect('mongodb+srv://newUser:newUser@clusterone-plhk1.mongodb.net/Shop?retryWrites=true&w=majority',{useNewUrlParser:true,useUnifiedTopology:true})
   .then(result => {
-    return User.findById(1);
-    // console.log(result);
-  })
-  .then(user => {
-    if (!user) {
-      return User.create({ name: 'Max', email: 'test@test.com' });
-    }
-    return user;
-  })
-  .then(user => {
-    // console.log(user);
-    return user.createCart();
-  })
-  .then(cart => {
+    User.findOne().then(user => {
+      if (!user) {
+        const user = new User({
+          name: 'Max',
+          email: 'max@test.com',
+          cart: {
+            items: []
+          }
+        });
+        user.save();
+      }
+    });
     app.listen(3000);
   })
   .catch(err => {
