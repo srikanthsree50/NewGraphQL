@@ -1,5 +1,5 @@
 const path = require('path');
-
+const port = process.env.PORT || 3000;
 const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
@@ -57,19 +57,9 @@ app.use(errorController.get404);
 mongoose
   .connect(MONGODB_URI,{useNewUrlParser:true,useUnifiedTopology:true})
   .then(result => {
-    User.findOne().then(user => {
-      if (!user) {
-        const user = new User({
-          name: 'Max',
-          email: 'max@test.com',
-          cart: {
-            items: []
-          }
-        });
-        user.save();
-      }
+    app.listen(port,() => {
+      console.log(`server listening at port ${port}`)
     });
-    app.listen(3000);
   })
   .catch(err => {
     console.log(err);
