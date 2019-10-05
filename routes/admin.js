@@ -1,24 +1,25 @@
 const path = require('path');
-const isRouteSecure = require('../RouteSecureMiddleware/isRouteSecure');
+
 const express = require('express');
 
 const adminController = require('../controllers/admin');
+const isAuth = require('../middleware/is-auth');
 
 const router = express.Router();
 
 // /admin/add-product => GET
-router.get('/add-product',isRouteSecure, adminController.getAddProduct);
+router.get('/add-product', isAuth, adminController.getAddProduct);
 
 // /admin/products => GET
-router.get('/products',isRouteSecure, adminController.getProducts);
+router.get('/products', isAuth, adminController.getProducts);
 
 // /admin/add-product => POST
-router.post('/add-product',isRouteSecure, adminController.postAddProduct);
+router.post('/add-product', isAuth, adminController.postAddProduct);
 
-router.get('/edit-product/:productId',isRouteSecure, adminController.getEditProduct);
+router.get('/edit-product/:productId', isAuth, adminController.getEditProduct);
 
-router.post('/edit-product',isRouteSecure, adminController.postEditProduct);
+router.post('/edit-product', isAuth, adminController.postEditProduct);
 
-router.post('/delete-product',isRouteSecure, adminController.postDeleteProduct);
+router.post('/delete-product', isAuth, adminController.postDeleteProduct);
 
 module.exports = router;
