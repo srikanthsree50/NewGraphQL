@@ -8,7 +8,16 @@ router.get('/login', authController.getLogin);
 
 router.get('/signup', authController.getSignup);
 
-router.post('/login', authController.postLogin);
+router.post('/login', [
+body('email')
+.isEmail()
+.withMessage('please enter a valid email address....')
+.normalizeEmail(),
+body('password','must enter a valid password...')
+.isLength({min:5})
+.isAlphanumeric()
+.trim()
+], authController.postLogin);
 
 router.post('/signup',[
     check('email')
@@ -28,11 +37,14 @@ router.post('/signup',[
           }
 
     })
-}),
+})
+.normalizeEmail(),
     body('password','please enter a password with numbers and characters with minimum 5 characters...')
     .isLength({min:5})
-    .isAlphanumeric(),
+    .isAlphanumeric()
+    .trim(),
     body('confirmPassword')
+    .trim()
     .custom((value,{req})=>{
 if(value !== req.body.password){
     throw new Error('password does not match...');
